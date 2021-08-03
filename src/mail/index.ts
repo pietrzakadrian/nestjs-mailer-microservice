@@ -7,7 +7,6 @@ import { MAIL_QUEUE } from './constants';
 import { MailProcessor } from './processors';
 import { MailService } from './services';
 import { MailController } from './controllers/mail.controller';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -31,18 +30,6 @@ import { JwtModule } from '@nestjs/jwt';
           dir: __dirname + '/templates',
           adapter: new HandlebarsAdapter(),
           options: { strict: true },
-        },
-      }),
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_VERIFICATION_TOKEN_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get(
-            'JWT_VERIFICATION_TOKEN_EXPIRATION_TIME',
-          )}s`,
         },
       }),
     }),

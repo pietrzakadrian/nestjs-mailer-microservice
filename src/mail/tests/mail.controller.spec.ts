@@ -1,8 +1,5 @@
 import { BullModule, getQueueToken } from '@nestjs/bull';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { mockedConfigService, mockedJwtService } from 'src/utils/mocks';
 import { MAIL_QUEUE } from '../constants';
 import { MailController } from '../controllers';
 import { MailService } from '../services';
@@ -23,17 +20,7 @@ describe('MailController', () => {
         }),
       ],
       controllers: [MailController],
-      providers: [
-        MailService,
-        {
-          provide: ConfigService,
-          useValue: mockedConfigService,
-        },
-        {
-          provide: JwtService,
-          useValue: mockedJwtService,
-        },
-      ],
+      providers: [MailService],
     })
       .overrideProvider(getQueueToken(MAIL_QUEUE))
       .useValue(exampleQueueMock)

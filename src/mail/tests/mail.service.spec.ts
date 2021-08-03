@@ -1,9 +1,6 @@
 import { BullModule, getQueueToken } from '@nestjs/bull';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Queue } from 'bull';
-import { mockedConfigService, mockedJwtService } from 'src/utils/mocks';
 import { MAIL_QUEUE } from '../constants';
 import { MailService } from '../services';
 
@@ -21,17 +18,7 @@ describe('MailService', () => {
           name: MAIL_QUEUE,
         }),
       ],
-      providers: [
-        MailService,
-        {
-          provide: ConfigService,
-          useValue: mockedConfigService,
-        },
-        {
-          provide: JwtService,
-          useValue: mockedJwtService,
-        },
-      ],
+      providers: [MailService],
     })
       .overrideProvider(getQueueToken(MAIL_QUEUE))
       .useValue(exampleQueueMock)
@@ -51,10 +38,13 @@ describe('MailService', () => {
   });
 
   it('should dispatch job', async () => {
-    await service.sendConfirmationEmail('test@test.com');
+    await service.sendConfirmationEmail(
+      'test@test.com',
+      'http://link.com?token=ey',
+    );
 
     expect(exampleQueueMock.add).toHaveBeenCalledWith('CONFIRM_REGISTRATION', {
-      confirmUrl: '7000?token=',
+      confirmUrl: 'http://link.com?token=ey',
       emailAddress: 'test@test.com',
     });
   });
